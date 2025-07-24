@@ -1,538 +1,180 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Task Distributor</title>
-  <meta name="description" content="Task Distributor - Ferramenta simples para criar perfis, cadastrar tarefas e distribuir tarefas automaticamente entre pessoas. Organize seu dia, equipe ou família com facilidade." />
-  <meta name="keywords" content="task distributor, distribuidor de tarefas, organizar tarefas, gerenciamento de tarefas, listas de tarefas, distribuir tarefas automaticamente, organização pessoal, produtividade, tarefas domésticas, divisão de tarefas, app de tarefas, controle de tarefas, tarefas em equipe, ferramenta para organizar tarefas, gestão de tarefas, app para organizar a rotina, gerenciamento de tempo, tarefas para família, distribuição automática de tarefas, plataforma de tarefas" />
-  <meta name="author" content="Lucas Garcia" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4f8;
-      margin: 0; padding: 20px;
-      color: #333;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    section {
-      background: white;
-      padding: 15px 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      font-size: 1rem;
-    }
-    button {
-      margin-top: 15px;
-      background-color: #3498db;
-      border: none;
-      color: white;
-      padding: 10px 18px;
-      font-size: 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #2980b9;
-    }
-    ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    ul li {
-      background: #ecf0f1;
-      margin-bottom: 8px;
-      border-radius: 6px;
-      padding: 8px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .task-owner {
-      font-weight: bold;
-      color: #2c3e50;
-    }
-    .task-name {
-      flex-grow: 1;
-      margin-left: 10px;
-    }
-    .done {
-      text-decoration: line-through;
-      color: #7f8c8d;
-    }
-    .checkbox {
-      cursor: pointer;
-      transform: scale(1.3);
-    }
-    .delete-btn {
-      background: transparent;
-      border: none;
-      color: #e74c3c;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 1.1rem;
-      margin-left: 10px;
-    }
-    .delete-btn:hover {
-      color: #c0392b;
-    }
-    .flex-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .profile-name {
-      background: #3498db;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 20px;
-      font-weight: bold;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s ease;
-    }
-    .profile-name:hover {
-      background: #2980b9;
-    }
-    .selected {
-      background: #2ecc71 !important;
-    }
-    .task-list {
-      margin-top: 10px;
-    }
-    .owner-section {
-      margin-bottom: 20px;
-    }
-    .owner-section h3 {
-      margin-bottom: 6px;
-      color: #34495e;
-      border-bottom: 1px solid #ccc;
-      padding-bottom: 4px;
-    }
-    .owner-tasks li {
-      display: flex;
-      align-items: center;
-      background: #ecf0f1;
-      margin-bottom: 6px;
-      border-radius: 6px;
-      padding: 6px 10px;
-    }
-    .owner-tasks li .checkbox {
-      margin-right: 10px;
-      transform: scale(1.2);
-      cursor: pointer;
-    }
-    .owner-tasks li .task-name {
-      flex-grow: 1;
-    }
-    .owner-tasks li .done {
-      text-decoration: line-through;
-      color: #7f8c8d;
-    }
-
-    /* Toast notification styles */
-    #toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 300px;
-    }
-    .toast {
-      background-color: #3498db;
-      color: white;
-      padding: 12px 18px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      opacity: 0;
-      transform: translateX(100%);
-      animation: slideIn 0.4s forwards, fadeOut 0.4s 3s forwards;
-      font-weight: bold;
-      user-select: none;
-    }
-    @keyframes slideIn {
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-    @keyframes fadeOut {
-      to {
-        opacity: 0;
-        transform: translateX(100%);
-      }
-    }
-
-    /* Modal styles */
-    #modalConfirm {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-    }
-    #modalConfirm.active {
-      display: flex;
-    }
-    #modalContent {
-      background: white;
-      border-radius: 12px;
-      padding: 20px 25px;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      text-align: center;
-      font-size: 1.1rem;
-      color: #333;
-    }
-    #modalButtons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-    #modalButtons button {
-      flex: 1;
-      padding: 10px 0;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-    #modalConfirm .btnConfirm {
-      background-color: #e74c3c;
-      color: white;
-    }
-    #modalConfirm .btnConfirm:hover {
-      background-color: #c0392b;
-    }
-    #modalConfirm .btnCancel {
-      background-color: #bdc3c7;
-      color: #2c3e50;
-    }
-    #modalConfirm .btnCancel:hover {
-      background-color: #95a5a6;
-    }
-
-    @media (max-width: 600px) {
-      .flex-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body>
+<body class="bg-light p-4">
+  <div class="container">
+    <h1 class="mb-4">Task Distributor</h1>
 
-  <h1>Task Distributor</h1>
+    <!-- Seção de Perfis -->
+    <div class="mb-3">
+      <h3>1. Criar Perfis</h3>
+      <input id="nomePessoa" type="text" class="form-control mb-2" placeholder="Nome da pessoa">
+      <button onclick="adicionarPerfil()" class="btn btn-primary mb-2">Adicionar Perfil</button>
+      <p id="erroPerfil" class="text-danger"></p>
+      <ul id="listaPessoas" class="list-group"></ul>
+    </div>
 
-  <section>
-    <h2>1. Criar Perfis</h2>
-    <input type="text" id="inputNome" placeholder="Nome da pessoa" />
-    <button onclick="adicionarPerfil()">Adicionar Perfil</button>
-    <ul id="listaPerfis"></ul>
-  </section>
+    <!-- Seção de Tasks -->
+    <div class="mb-3">
+      <h3>2. Adicionar Tasks</h3>
+      <input id="novaTask" type="text" class="form-control mb-2" placeholder="Nome da task">
+      <button onclick="adicionarTask()" class="btn btn-primary mb-2">Adicionar Task</button>
+      <p id="erroTask" class="text-danger"></p>
+      <ul id="listaTasks" class="list-group"></ul>
+    </div>
 
-  <section>
-    <h2>2. Cadastrar Tarefas</h2>
-    <input type="text" id="inputTarefa" placeholder="Nome da tarefa" />
-    <button onclick="adicionarTarefa()">Adicionar Tarefa</button>
-    <ul id="listaTarefas"></ul>
-  </section>
+    <!-- Multiplicação de Task -->
+    <div class="mb-3">
+      <input id="taskMultiplicar" type="text" class="form-control mb-2" placeholder="Nome do task para multiplicar">
+      <input id="quantidade" type="number" value="1" min="1" class="form-control mb-2" placeholder="Quantas vezes">
+      <button onclick="multiplicarTask()" class="btn btn-primary">Multiplicar Task</button>
+    </div>
 
-  <section>
-    <h2>3. Distribuir Tarefas</h2>
-    <button onclick="distribuirTarefas()">Distribuir Automaticamente</button>
-    <div id="listaTarefasDistribuidas" class="task-list"></div>
-  </section>
+    <!-- Distribuição -->
+    <div class="mb-3">
+      <h3>3. Distribuir Tasks</h3>
+      <button onclick="distribuirTasks()" class="btn btn-success mb-2">Distribuir Automaticamente</button>
+      <ul id="resultadoDistribuicao" class="list-group"></ul>
+    </div>
 
-  <!-- Container para as notificações toast -->
-  <div id="toast-container"></div>
-
-  <!-- Modal de confirmação -->
-  <div id="modalConfirm">
-    <div id="modalContent">
-      <div id="modalMessage">Mensagem de confirmação</div>
-      <div id="modalButtons">
-        <button class="btnConfirm">Confirmar</button>
-        <button class="btnCancel">Cancelar</button>
-      </div>
+    <!-- Botão para Ver Ranking -->
+    <div class="mb-3">
+      <h3>4. Acompanhamento</h3>
+      <button onclick="mostrarRanking()" class="btn btn-secondary mb-2">Ver Ranking</button>
+      <ul id="ranking" class="list-group"></ul>
     </div>
   </div>
 
   <script>
     let perfis = JSON.parse(localStorage.getItem('perfis')) || [];
-    let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-    let tarefasDistribuidas = JSON.parse(localStorage.getItem('tarefasDistribuidas')) || [];
-
-    const listaPerfis = document.getElementById('listaPerfis');
-    const listaTarefas = document.getElementById('listaTarefas');
-    const listaTarefasDistribuidas = document.getElementById('listaTarefasDistribuidas');
-    const toastContainer = document.getElementById('toast-container');
-
-    // Modal elements
-    const modalConfirm = document.getElementById('modalConfirm');
-    const modalMessage = document.getElementById('modalMessage');
-    const btnConfirm = modalConfirm.querySelector('.btnConfirm');
-    const btnCancel = modalConfirm.querySelector('.btnCancel');
-
-    // Variáveis para saber qual ação vai ser confirmada
-    let onConfirmCallback = null;
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let concluidas = JSON.parse(localStorage.getItem('concluidas')) || {};
 
     function salvarDados() {
       localStorage.setItem('perfis', JSON.stringify(perfis));
-      localStorage.setItem('tarefas', JSON.stringify(tarefas));
-      localStorage.setItem('tarefasDistribuidas', JSON.stringify(tarefasDistribuidas));
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      localStorage.setItem('concluidas', JSON.stringify(concluidas));
     }
 
-    function renderizarPerfis() {
-      listaPerfis.innerHTML = '';
-      perfis.forEach((perfil, index) => {
-        const li = document.createElement('li');
-        li.textContent = perfil;
-        const btnDelete = document.createElement('button');
-        btnDelete.textContent = 'X';
-        btnDelete.className = 'delete-btn';
-        btnDelete.title = 'Excluir perfil';
-        btnDelete.onclick = () => {
-          abrirModalConfirm(`Excluir perfil "${perfil}"? Isso removerá as tarefas distribuídas a ele.`, () => {
-            perfis.splice(index, 1);
-            tarefasDistribuidas = tarefasDistribuidas.filter(t => t.owner !== perfil);
-            salvarDados();
-            renderizarPerfis();
-            renderizarTarefas();
-            renderizarTarefasDistribuidas();
-            mostrarToast(`Perfil "${perfil}" removido.`);
-          });
-        }
-        li.appendChild(btnDelete);
-        listaPerfis.appendChild(li);
+    function atualizarLista(id, array, removerCallback) {
+      const ul = document.getElementById(id);
+      ul.innerHTML = "";
+      array.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item d-flex justify-content-between align-items-center";
+        li.innerHTML = `
+          ${item}
+          <button onclick="${removerCallback}(${index})" class="btn btn-sm btn-danger">✖</button>
+        `;
+        ul.appendChild(li);
       });
-    }
-
-    function renderizarTarefas() {
-      listaTarefas.innerHTML = '';
-      tarefas.forEach((tarefa, index) => {
-        const li = document.createElement('li');
-        li.textContent = tarefa;
-        const btnDelete = document.createElement('button');
-        btnDelete.textContent = 'X';
-        btnDelete.className = 'delete-btn';
-        btnDelete.title = 'Excluir tarefa';
-        btnDelete.onclick = () => {
-          abrirModalConfirm(`Excluir tarefa "${tarefa}"?`, () => {
-            tarefas.splice(index, 1);
-            tarefasDistribuidas = tarefasDistribuidas.filter(t => t.task !== tarefa);
-            salvarDados();
-            renderizarTarefas();
-            renderizarTarefasDistribuidas();
-            mostrarToast(`Tarefa "${tarefa}" removida.`);
-          });
-        }
-        li.appendChild(btnDelete);
-        listaTarefas.appendChild(li);
-      });
-    }
-
-    function renderizarTarefasDistribuidas() {
-      listaTarefasDistribuidas.innerHTML = '';
-      if (tarefasDistribuidas.length === 0) {
-        listaTarefasDistribuidas.textContent = 'Nenhuma tarefa distribuída ainda.';
-        return;
-      }
-
-      const agrupado = {};
-      tarefasDistribuidas.forEach(item => {
-        if (!agrupado[item.owner]) agrupado[item.owner] = [];
-        agrupado[item.owner].push(item);
-      });
-
-      for (const owner in agrupado) {
-        const sectionOwner = document.createElement('div');
-        sectionOwner.className = 'owner-section';
-
-        const h3 = document.createElement('h3');
-        h3.textContent = owner + ':';
-        sectionOwner.appendChild(h3);
-
-        const ul = document.createElement('ul');
-        ul.className = 'owner-tasks';
-
-        agrupado[owner].forEach((item) => {
-          const li = document.createElement('li');
-
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.className = 'checkbox';
-          checkbox.checked = item.done;
-          checkbox.onchange = () => {
-            const globalIndex = tarefasDistribuidas.indexOf(item);
-            if(globalIndex > -1) {
-              tarefasDistribuidas[globalIndex].done = checkbox.checked;
-              salvarDados();
-              renderizarTarefasDistribuidas();
-            }
-          };
-
-          const spanTask = document.createElement('span');
-          spanTask.textContent = item.task;
-          spanTask.className = 'task-name';
-          if(item.done) {
-            spanTask.classList.add('done');
-          }
-
-          const btnDelete = document.createElement('button');
-          btnDelete.textContent = 'X';
-          btnDelete.className = 'delete-btn';
-          btnDelete.title = 'Remover esta tarefa distribuída';
-          btnDelete.onclick = () => {
-            abrirModalConfirm(`Remover a tarefa "${item.task}" do perfil "${owner}"?`, () => {
-              const globalIndex = tarefasDistribuidas.indexOf(item);
-              if(globalIndex > -1) {
-                tarefasDistribuidas.splice(globalIndex,1);
-                salvarDados();
-                renderizarTarefasDistribuidas();
-                mostrarToast(`Tarefa "${item.task}" removida do perfil "${owner}".`);
-              }
-            });
-          };
-
-          li.appendChild(checkbox);
-          li.appendChild(spanTask);
-          li.appendChild(btnDelete);
-          ul.appendChild(li);
-        });
-
-        sectionOwner.appendChild(ul);
-        listaTarefasDistribuidas.appendChild(sectionOwner);
-      }
     }
 
     function adicionarPerfil() {
-      const inputNome = document.getElementById('inputNome');
-      const nome = inputNome.value.trim();
+      const nome = document.getElementById("nomePessoa").value.trim();
       if (!nome) {
-        mostrarToast('Por favor, digite o nome da pessoa.', true);
+        document.getElementById("erroPerfil").textContent = "Digite um nome.";
         return;
       }
-      if(perfis.includes(nome)) {
-        mostrarToast('Este perfil já existe.', true);
-        return;
-      }
+      document.getElementById("erroPerfil").textContent = "";
       perfis.push(nome);
+      concluidas[nome] = 0;
+      document.getElementById("nomePessoa").value = "";
       salvarDados();
-      renderizarPerfis();
-      inputNome.value = '';
-      mostrarToast(`Perfil "${nome}" criado com sucesso!`);
+      atualizarLista("listaPessoas", perfis, "removerPerfil");
     }
 
-    function adicionarTarefa() {
-      const inputTarefa = document.getElementById('inputTarefa');
-      const tarefa = inputTarefa.value.trim();
-      if (!tarefa) {
-        mostrarToast('Por favor, digite o nome da tarefa.', true);
-        return;
-      }
-      if(tarefas.includes(tarefa)) {
-        mostrarToast('Esta tarefa já existe.', true);
-        return;
-      }
-      tarefas.push(tarefa);
+    function removerPerfil(index) {
+      delete concluidas[perfis[index]];
+      perfis.splice(index, 1);
       salvarDados();
-      renderizarTarefas();
-      inputTarefa.value = '';
-      mostrarToast(`Tarefa "${tarefa}" criada com sucesso!`);
+      atualizarLista("listaPessoas", perfis, "removerPerfil");
     }
 
-    function distribuirTarefas() {
-      if(perfis.length === 0) {
-        mostrarToast('Adicione pelo menos um perfil antes de distribuir tarefas.', true);
+    function adicionarTask() {
+      const task = document.getElementById("novaTask").value.trim();
+      if (!task) {
+        document.getElementById("erroTask").textContent = "Digite uma task.";
         return;
       }
-      if(tarefas.length === 0) {
-        mostrarToast('Adicione pelo menos uma tarefa antes de distribuir.', true);
-        return;
-      }
-      tarefasDistribuidas = [];
-      let idxPerfil = 0;
-      for(let t of tarefas) {
-        const owner = perfis[idxPerfil];
-        tarefasDistribuidas.push({ task: t, owner: owner, done: false });
-        idxPerfil++;
-        if(idxPerfil >= perfis.length) idxPerfil = 0;
+      document.getElementById("erroTask").textContent = "";
+      tasks.push(task);
+      document.getElementById("novaTask").value = "";
+      salvarDados();
+      atualizarLista("listaTasks", tasks, "removerTask");
+    }
+
+    function removerTask(index) {
+      tasks.splice(index, 1);
+      salvarDados();
+      atualizarLista("listaTasks", tasks, "removerTask");
+    }
+
+    function multiplicarTask() {
+      const taskNome = document.getElementById("taskMultiplicar").value.trim();
+      const quantidade = parseInt(document.getElementById("quantidade").value);
+      if (!taskNome || isNaN(quantidade) || quantidade < 1) return;
+      for (let i = 0; i < quantidade; i++) {
+        tasks.push(taskNome);
       }
       salvarDados();
-      renderizarTarefasDistribuidas();
-      mostrarToast('Tarefas distribuídas automaticamente!');
+      atualizarLista("listaTasks", tasks, "removerTask");
     }
 
-    // Funções do modal
-    function abrirModalConfirm(mensagem, callbackConfirm) {
-      modalMessage.textContent = mensagem;
-      modalConfirm.classList.add('active');
-      onConfirmCallback = callbackConfirm;
+    function distribuirTasks() {
+      if (perfis.length === 0 || tasks.length === 0) return;
+      const distribuicao = {};
+      perfis.forEach(p => distribuicao[p] = []);
+      let index = 0;
+      for (let i = 0; i < tasks.length; i++) {
+        const pessoa = perfis[index];
+        distribuicao[pessoa].push(tasks[i]);
+        index = (index + 1) % perfis.length;
+      }
+      const resultadoUl = document.getElementById("resultadoDistribuicao");
+      resultadoUl.innerHTML = "";
+      for (const pessoa in distribuicao) {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.innerHTML = `<strong>${pessoa}</strong>: <ul>` +
+          distribuicao[pessoa].map(task => `
+            <li>
+              <input type='checkbox' onchange='marcarConcluida("${pessoa}")'> ${task}
+            </li>`
+          ).join("") + `</ul>`;
+        resultadoUl.appendChild(li);
+      }
     }
 
-    btnConfirm.onclick = () => {
-      if(onConfirmCallback) onConfirmCallback();
-      fecharModalConfirm();
-    };
-
-    btnCancel.onclick = () => {
-      fecharModalConfirm();
-    };
-
-    function fecharModalConfirm() {
-      modalConfirm.classList.remove('active');
-      onConfirmCallback = null;
+    function marcarConcluida(nome) {
+      if (concluidas[nome] !== undefined) {
+        concluidas[nome]++;
+      } else {
+        concluidas[nome] = 1;
+      }
+      salvarDados();
     }
 
-    // Toast notifications
-    function mostrarToast(mensagem, isError = false) {
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      if(isError) toast.style.backgroundColor = '#e74c3c';
-      toast.textContent = mensagem;
-      toastContainer.appendChild(toast);
-      setTimeout(() => {
-        toast.remove();
-      }, 3500);
+    function mostrarRanking() {
+      const ul = document.getElementById("ranking");
+      ul.innerHTML = "";
+      const ordenado = Object.entries(concluidas).sort((a, b) => b[1] - a[1]);
+      ordenado.forEach(([nome, pontos]) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.textContent = `${nome} - ${pontos} tarefas concluídas`;
+        ul.appendChild(li);
+      });
     }
 
-    // Inicialização
-    renderizarPerfis();
-    renderizarTarefas();
-    renderizarTarefasDistribuidas();
+    // Carrega as listas ao abrir a página
+    atualizarLista("listaPessoas", perfis, "removerPerfil");
+    atualizarLista("listaTasks", tasks, "removerTask");
   </script>
-
 </body>
 </html>
